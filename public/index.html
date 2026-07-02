@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Placement Preparation Tracker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <h1>Placement Preparation Tracker</h1>
+    <div id="message"></div>
+    <input type="text" id="searchInput" placeholder="Search topics...">
+
+    <label for="categoryFilter">Filter by Category:</label>
+
+    <select id="categoryFilter">
+
+    </select>
+
+    <form id="topicForm">
+
+        <div>
+            <label>Category:</label>
+            <select id="category">
+                <option value="DSA">DSA</option>
+                <option value="DBMS">DBMS</option>
+                <option value="OS">OS</option>
+                <option value="CN">CN</option>
+            </select>
+        </div>
+
+        <br>
+
+        <div>
+            <label>Topic Name:</label>
+            <input type="text" id="topicName" placeholder="Enter topic name">
+        </div>
+
+        <br>
+
+        <div>
+            <label>Status:</label>
+            <select id="status">
+                <option value="Pending">Pending</option>
+                <option value="Completed">Completed</option>
+            </select>
+        </div>
+
+        <br>
+
+        <div>
+            <label>Questions Solved:</label>
+            <input type="number" id="questionsSolved">
+        </div>
+
+        <br>
+
+        <button id="submit" type="submit">Add Topic</button>
+
+    </form>
+    <div id="topicsContainer"></div>
+
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
