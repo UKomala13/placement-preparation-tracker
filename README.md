@@ -1,77 +1,91 @@
 #  Placement Preparation Tracker
 
-A full-stack web application that helps students organize and track their placement preparation progress.
+A full-stack web application that helps students organize and track their placement preparation efficiently.
 
-This project allows users to manage topics, monitor completion status, search topics instantly, and organize preparation efficiently.
+The application allows users to securely register and log in, manage their preparation topics, monitor progress, search topics instantly, and filter topics by category. Each user's data is protected using JWT Authentication.
 
 ---
 
-##  Prerequisites
+# Features
 
-Before running this project, make sure you have:
+##  Authentication
 
-- Node.js (v18 or later recommended)
-- npm
-- MySQL Server
+- User Registration
+- User Login
+- JWT Authentication
+- Protected Routes
+- Secure Logout
+- User-specific Topic Management
+
+---
+
+##  Topic Management
+
+- Add new preparation topics
+- View all topics
+- Update existing topics
+- Delete topics with confirmation
+
+---
+
+##  Search
+
+- Live topic search
+- Case-insensitive filtering
+
+---
+
+##  Category Filtering
+
+- Dynamic category dropdown
+- Automatically updates when new categories are added
+- Search and category filters work together
+
+---
+
+##  User Experience
+
+- Loading states during API requests
+- Success and error notifications
+- Edit mode with auto-filled form
+- Responsive card-based layout
+- Empty state when no topics are available
+- Session expiration handling
+
+---
+
+#  Tech Stack
+
+## Frontend
+
+- HTML5
+- CSS3
+- JavaScript (ES6)
+
+## Backend
+
+- Node.js
+- Express.js
+
+## Database
+
+- MySQL
+
+## Authentication
+
+- JSON Web Token (JWT)
+- bcrypt
+
+## Tools
+
 - Git
-- VS Code (recommended)
-
-##  Features
-
-###  Topic Management
-
-* Add new preparation topics
-* View all topics
-* Update existing topics
-* Delete topics with confirmation
-
-###  Search
-
-* Live topic search
-* Case-insensitive filtering
-
-###  Category Filtering
-
-* Dynamic category dropdown
-* Automatically updates when new categories are added
-* Multiple filters can be combined
-
-###  User Experience
-
-* Success and error notifications
-* Edit mode with auto-filled form
-* Responsive card-based interface
-* Empty state when no topics are found
+- GitHub
+- VS Code
+- Postman
 
 ---
 
-##  Tech Stack
-
-### Frontend
-
-* HTML5
-* CSS3
-* JavaScript (ES6)
-
-### Backend
-
-* Node.js
-* Express.js
-
-### Database
-
-* MySQL
-
-### Tools
-
-* Git
-* GitHub
-* VS Code
-
-
----
-
-##  Project Structure
+#  Project Structure
 
 ```
 Placement-Preparation-Tracker/
@@ -79,12 +93,18 @@ Placement-Preparation-Tracker/
 ├── backend/
 │   ├── server.js
 │   ├── package.json
+│   ├── package-lock.json
+│   ├── .env
 │   └── node_modules/
 │
 ├── public/
 │   ├── index.html
-│   ├── style.css
-│   └── script.js
+│   ├── login.html
+│   ├── register.html
+│   ├── script.js
+│   ├── login.js
+│   ├── register.js
+│   └── style.css
 │
 ├── .gitignore
 ├── .env.example
@@ -93,56 +113,64 @@ Placement-Preparation-Tracker/
 
 ---
 
-##  Installation
+#  Installation
 
-### 1. Clone the repository
+## 1. Clone the repository
 
 ```bash
 git clone https://github.com/YOUR_USERNAME/placement-preparation-tracker.git
 ```
 
-### 2. Navigate to the project
+## 2. Navigate to the project
 
 ```bash
 cd placement-preparation-tracker
 ```
 
-### 3. Install dependencies
+## 3. Install dependencies
 
 ```bash
 npm install
 ```
 
-### 4. Create a MySQL database
+---
 
-Create a database named:
+## 4. Create MySQL Database
+
+Create a database named
 
 ```
 placement_tracker
 ```
 
-Import the required SQL tables.
+Import the SQL schema into MySQL.
 
-### 5. Configure environment variables
+---
 
-Create a file named .env inside the backend folder.
+## 5. Configure Environment Variables
 
-You can copy the example file:
+Create a `.env` file inside the **backend** folder.
 
-cp ../.env.example .env
+You can copy `.env.example` or create it manually.
 
-Or create it manually with the following variables:
+Example:
+
+```env
+PORT=3000
 
 DB_HOST=localhost
 DB_USER=your_mysql_username
 DB_PASSWORD=your_mysql_password
 DB_NAME=placement_tracker
-PORT=3000
 
-Replace the placeholder values with your own MySQL credentials.
+JWT_SECRET=your_secret_key
 ```
 
-### 6. Start the backend server
+Replace the placeholder values with your own credentials.
+
+---
+
+## 6. Start the Backend Server
 
 ```bash
 node server.js
@@ -154,21 +182,100 @@ or
 nodemon server.js
 ```
 
-### 7. Open the frontend
+---
 
-Open `index.html` using Live Server or your preferred local development server.
+## 7. Run the Frontend
+
+Open the project using **Live Server** or any local development server.
+
+Navigate to:
+
+```
+login.html
+```
+
+Register a new account and start using the application.
 
 ---
 
-##  Future Improvements
+#  Authentication Flow
 
-### Stage 2
+1. User registers with Name, Email and Password.
+2. Password is securely hashed using **bcrypt**.
+3. User logs in using registered credentials.
+4. Backend generates a **JWT Token**.
+5. Token is stored in **localStorage**.
+6. Protected API requests send the token using:
 
-* User Registration
-* User Login
-* JWT Authentication
-* Password Hashing (bcrypt)
-* User-specific Topics
-* Profile Page
-* Protected Routes
+```http
+Authorization: Bearer <token>
+```
 
+7. Backend verifies the token before processing requests.
+8. Users can access only their own topics.
+
+---
+
+## API Endpoints
+
+### Authentication
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | /register | Register a new user |
+| POST | /login | Login user |
+
+### Topics
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /topics | Get all topics of logged-in user |
+| POST | /topics | Add a new topic |
+| PUT | /topics/:id | Update a topic |
+| DELETE | /topics/:id | Delete a topic |
+
+---
+
+## Database Schema
+
+### users
+
+| Column | Type |
+|---------|------|
+| id | INT (Primary Key) |
+| name | VARCHAR |
+| email | VARCHAR (Unique) |
+| password | VARCHAR |
+
+### topics
+
+| Column | Type |
+|---------|------|
+| id | INT (Primary Key) |
+| category | VARCHAR |
+| topic_name | VARCHAR |
+| status | VARCHAR |
+| questions_solved | INT |
+| user_id | INT (Foreign Key → users.id) |
+
+---
+
+#  Key Learning Outcomes
+
+This project helped in understanding:
+
+- REST API Development
+- CRUD Operations
+- Express.js Routing
+- MySQL Integration
+- JWT Authentication
+- Password Hashing using bcrypt
+- Middleware
+- Protected Routes
+- Fetch API
+- Async/Await
+- DOM Manipulation
+- Search & Filter Implementation
+- Frontend-Backend Communication
+
+---

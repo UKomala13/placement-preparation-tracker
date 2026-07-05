@@ -1,9 +1,17 @@
+//to redirect to login page if session is time out
+const token = localStorage.getItem("token");
+if (token === null) {
+    window.location = "login.html"
+}
+
+
 const form = document.getElementById("topicForm");
 const topicscontainer = document.getElementById("topicsContainer")
 const submitBtn = document.getElementById("submit");
 const message = document.getElementById("message");
 const searchInput = document.getElementById("searchInput");
 const categoryFilter = document.getElementById("categoryFilter");
+const logoutbtn = document.getElementById("logoutBtn");
 
 const category = document.getElementById("category");
 const topicName = document.getElementById("topicName");
@@ -27,6 +35,12 @@ function showMessage(text, type) {
     setTimeout(() => {
         message.textContent = "";
     }, 3000);
+}
+
+function resetForm() {
+    form.reset();
+    editTopicId = null;
+    submitBtn.textContent = "Add Topic";
 }
 
 function populateCategoryFilter() {  //to fill the dropdown
@@ -65,14 +79,24 @@ function applyFilters() {
             topic.category === selectedCategory
         )
     }
-    topicscontainer.innerHTML="";
+    topicscontainer.innerHTML = "";
     if (filteredTopics.length === 0) {
         topicscontainer.innerHTML = "<h2> No topics found </h2>";
         return;
     }
     renderTopics(filteredTopics);
-
 }
+
+function handleUnauthorized(response) {
+    if (response.status === 401) {
+        localStorage.removeItem("token");
+        window.location = "login.html";
+        return true;
+    }
+
+    return false;
+}
+
 function renderTopics(topicsArray) {
     topicsArray.forEach(topic => {
         let div = document.createElement("div");
@@ -91,7 +115,16 @@ function renderTopics(topicsArray) {
 }
 
 async function getTopics() {
-    const response = await fetch("http://localhost:3000/topics");
+    const response = await fetch("http://localhost:3000/topics", {
+        headers: {
+            "Authorization": "Bearer " + token
+        }
+    });
+
+    if (handleUnauthorized(response)) {
+        return;
+    }
+
     topics = await response.json();
 
     populateCategoryFilter();
@@ -134,10 +167,17 @@ async function deleteTopic(id) {
         return;
     }
 
-    await fetch(`http://localhost:3000/topics/${id}`, {
+    const response = await fetch(`http://localhost:3000/topics/${id}`, {
         method: "DELETE",
+        headers: {
+            "Authorization": "Bearer " + token
+        }
 
     });
+
+    if (handleUnauthorized(response)) {
+        return;
+    }
     await getTopics();
     showMessage("Topic deleted successfully");
 }
@@ -146,11 +186,14 @@ async function addTopic(topicData) {
     const response = await fetch("http://localhost:3000/topics", {
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
         },
         body: JSON.stringify(topicData)
     });
-
+    if (handleUnauthorized(response)) {
+        return;
+    }
     return response;
 }
 
@@ -158,18 +201,17 @@ async function updateTopic(topicData) {
     const response = await fetch(`http://localhost:3000/topics/${editTopicId}`, {
         method: "PUT",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
         },
         body: JSON.stringify(topicData)
     });
 
-    return response;
-}
+    if (handleUnauthorized(response)) {
+        return;
+    }
 
-function resetForm() {
-    form.reset();
-    editTopicId = null;
-    submitBtn.textContent = "Add Topic";
+    return response;
 }
 
 form.addEventListener("submit", async (event) => {
@@ -182,6 +224,9 @@ form.addEventListener("submit", async (event) => {
         questionsSolved: questionsSolved.value
     };
 
+    let response;
+    let successMessage;
+    
     if (editTopicId === null) {
         response = await addTopic(topicData);
         successMessage = "Topic added successfully!";
@@ -207,5 +252,10 @@ searchInput.addEventListener("input", () => {
 categoryFilter.addEventListener("change", () => {
     applyFilters();
 });
+
+logoutbtn.addEventListener("click", () => {
+    localStorage.removeItem("token");
+    window.location = "login.html"
+})
 
 getTopics();
